@@ -1,0 +1,33 @@
+{
+  "repository": "github:playstudios/action-nuget-publish-all",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts",
+    "test": "jest",
+    "pack": "ncc build src/main.ts"
+  },
+  "dependencies": {
+    "@actions/core": "^1.2.4",
+    "@actions/exec": "^1.0.4",
+    "@actions/github": "^2.2.0",
+    "@actions/glob": "^0.1.0",
+    "@types/xmldom": "^0.1.29",
+    "form-data": "^3.0.0",
+    "got": "^11.1.4",
+    "rxjs": "^6.5.5",
+    "xmldom": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.2.3",
+    "@zeit/ncc": "^0.22.3",
+    "eslint": "^6.8.0",
+    "eslint-plugin-github": "^4.0.1",
+    "eslint-plugin-jest": "^23.13.2",
+    "jest": "^26.0.1",
+    "jest-circus": "^26.0.1",
+    "prettier": "^2.0.5",
+    "ts-jest": "^26.0.0",
+    "typescript": "^3.9.3"
+  }
+}
