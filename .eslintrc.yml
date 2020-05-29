@@ -1,0 +1,14 @@
+plugins:
+  - jest
+  - github
+extends:
+  - plugin:github/recommended
+  - plugin:github/typescript
+  - plugin:jest/recommended
+parser: '@typescript-eslint/parser'
+env:
+  node: true
+  es2017: true
+  jest: true
+rules:
+  github/no-then: 'off'

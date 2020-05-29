@@ -1,0 +1,10 @@
+name: action-nuget-publish-all
+description: Build and publish all unpublished projects as nuget packages
+author: PlayStudios
+inputs:
+  token:
+    description: Github token
+    required: true
+runs:
+  using: node12
+  main: dist/index.js
