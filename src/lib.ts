@@ -17,10 +17,7 @@ export interface ProjInfo {
   packageId: string
   packable: boolean
   version: string | undefined
-}
-
-export interface PackageInfo {
-  versions: string[]
+  publishable: boolean
 }
 
 export const initDotnet = (): Promise<number> => {
@@ -56,6 +53,7 @@ export const projInfoFromXml = (csprojPath: string) => (xml: string): ProjInfo =
     packageId: getProp('PackageId', doc) || getProp('AssemblyName', doc) || path.basename(csprojPath, '.csproj'),
     packable: getProp('IsPackable', doc)?.toLowerCase() === 'true',
     version: getProp('Version', doc),
+    publishable: false,
   }
 }
 
@@ -66,44 +64,41 @@ export const findPublishables = (projs: ProjInfo[], owner: string, token: string
   from(projs)
     .pipe(
       mergeMap((projInfo) =>
-        fetchPackageInfo(projInfo.packageId, owner, token).then((packageInfo): ProjInfo & PackageInfo => ({
-          ...projInfo,
-          ...packageInfo,
-        })),
+        queryPublishable(projInfo.packageId, owner, token).then(
+          (publishable): ProjInfo => ({
+            ...projInfo,
+            publishable,
+          }),
+        ),
       ),
       tap((p) => {
-        if (isPublishable(p)) {
-          info(`${p.packageId}: version ${p.version} found, skipping`)
-        } else {
+        if (p.publishable) {
           info(`${p.packageId}: version ${p.version} not found, publishing`)
+        } else {
+          info(`${p.packageId}: version ${p.version} found, skipping`)
         }
       }),
-      filter((p) => !isPublishable(p)),
+      filter((p) => p.publishable),
       toArray(),
     )
     .toPromise()
 
-export const fetchPackageInfo = (packageId: string, owner: string, token: string): Promise<PackageInfo> =>
+export const queryPublishable = (packageId: string, owner: string, token: string): Promise<boolean> =>
   from(
-    got(`https://nuget.pkg.github.com/${owner}/download/${packageId}/index.json`, {
+    got(`https://nuget.pkg.github.com/${owner}/${packageId}.json`, {
       throwHttpErrors: false,
       password: token,
     }),
   )
     .pipe(
-      map(
-        (r): PackageInfo => {
-          if (![200, 404].includes(r.statusCode)) {
-            throw new Error(`Failed fetching versions for ${packageId}: ${r.statusCode} ${r.statusMessage}`)
-          }
-          return r.statusCode === 200 ? JSON.parse(r.body) : { versions: [] }
-        },
-      ),
+      map((r) => {
+        if (![200, 404].includes(r.statusCode)) {
+          throw new Error(`Failed fetching versions for ${packageId}: ${r.statusCode} ${r.statusMessage}`)
+        }
+        return r.statusCode === 200
+      }),
     )
     .toPromise()
-
-export const isPublishable = (p: ProjInfo & PackageInfo): boolean =>
-  typeof p.version === 'string' && p.versions.includes(p.version)
 
 export const createSln = (projs: ProjInfo[]): Promise<number> =>
   exec('dotnet new sln -n _ci_nuget').then(() =>
