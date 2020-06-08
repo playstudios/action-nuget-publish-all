@@ -117,6 +117,7 @@ export const pack = (repoUrl: string, outpath = path.resolve('dist')): Promise<n
             '-t:Pack',
             '-r',
             '-m',
+            '-p:RestorePackagesConfig=true',
             '-p:Configuration=Release',
             `-p:PackageOutputPath=${outpath}`,
             `-p:RepositoryUrl=${repoUrl}`,
