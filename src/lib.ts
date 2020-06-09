@@ -16,7 +16,7 @@ export interface ProjInfo {
   csprojDoc: XMLDocument
   packageId: string
   packable: boolean
-  version: string | undefined
+  version: string
   publishable: boolean
 }
 
@@ -52,7 +52,7 @@ export const projInfoFromXml = (csprojPath: string) => (xml: string): ProjInfo =
     csprojDoc: doc,
     packageId: getProp('PackageId', doc) || getProp('AssemblyName', doc) || path.basename(csprojPath, '.csproj'),
     packable: getProp('IsPackable', doc)?.toLowerCase() === 'true',
-    version: getProp('Version', doc),
+    version: getProp('Version', doc) || '',
     publishable: false,
   }
 }
@@ -64,7 +64,7 @@ export const findPublishables = (projs: ProjInfo[], owner: string, token: string
   from(projs)
     .pipe(
       mergeMap((projInfo) =>
-        queryPublishable(projInfo.packageId, owner, token).then(
+        queryPublishable(projInfo.packageId, projInfo.version, owner, token).then(
           (publishable): ProjInfo => ({
             ...projInfo,
             publishable,
@@ -83,9 +83,9 @@ export const findPublishables = (projs: ProjInfo[], owner: string, token: string
     )
     .toPromise()
 
-export const queryPublishable = (packageId: string, owner: string, token: string): Promise<boolean> =>
+export const queryPublishable = (packageId: string, version: string, owner: string, token: string): Promise<boolean> =>
   from(
-    got(`https://nuget.pkg.github.com/${owner}/${packageId}.json`, {
+    got(`https://nuget.pkg.github.com/${owner}/${packageId}/${version}.json`, {
       throwHttpErrors: false,
       password: token,
     }),
