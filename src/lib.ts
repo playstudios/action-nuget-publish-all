@@ -95,7 +95,7 @@ export const queryPublishable = (packageId: string, owner: string, token: string
         if (![200, 404].includes(r.statusCode)) {
           throw new Error(`Failed fetching versions for ${packageId}: ${r.statusCode} ${r.statusMessage}`)
         }
-        return r.statusCode === 200
+        return r.statusCode === 404
       }),
     )
     .toPromise()
