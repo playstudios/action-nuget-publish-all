@@ -94,7 +94,7 @@ test('projInfoFromPath: without version', () => {
     csprojPath,
     packageId: 'Foo.Bar',
     packable: true,
-    version: undefined,
+    version: '',
   })
 })
 
