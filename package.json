@@ -8,7 +8,7 @@
     "pack": "ncc build src/main.ts"
   },
   "dependencies": {
-    "@actions/core": "^1.2.4",
+    "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
     "@actions/github": "^2.2.0",
     "@actions/glob": "^0.1.0",
