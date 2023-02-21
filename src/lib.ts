@@ -123,7 +123,7 @@ export const pack = (repoUrl: string, outpath = path.resolve('dist')): Promise<n
             `-p:RepositoryUrl=${repoUrl}`,
           ]),
         )
-    : exec(`dotnet pack _ci_nuget.sln -c release -:PackageOutputPath=${outpath} -p:RepositoryUrl=${repoUrl}`)
+    : exec(`dotnet pack _ci_nuget.sln -c release -p:PackageOutputPath=${outpath} -p:RepositoryUrl=${repoUrl}`)
 
 export const findMSBuild = (): Promise<string> =>
   new Promise((resolve) =>
