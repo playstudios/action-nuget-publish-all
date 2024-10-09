@@ -1,0 +1,11 @@
+name: Clean
+on: delete
+
+jobs:
+  clean-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: playstudios/action-release-action@v1
+        with:
+          repo-token: ${{ github.token }}
+          clean: true

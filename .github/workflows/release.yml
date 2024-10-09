@@ -1,0 +1,29 @@
+name: Release
+on:
+  push:
+    branches-ignore:
+      - release/**
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Build
+        env: 
+          INPUT_DOCKERPASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          NODE_OPTIONS: --openssl-legacy-provider # Workaround for `ncc pack` with node 16
+        run: |
+          echo ::group::install deps
+          npm ci
+          echo ::group::lint
+          npm run lint
+          echo ::group::test
+          npm test
+          echo ::group::pack
+          npm run pack
+      - uses: playstudios/action-release-action@v1
+        with:
+          repo-token: ${{ github.token }}
